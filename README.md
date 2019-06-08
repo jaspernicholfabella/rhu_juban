@@ -7,3 +7,6 @@ this is created using FLASK
 pip install flask
 pip install flask_mysqldb
 
+
+
+**import rhu_juban.sql into xampp localhost
