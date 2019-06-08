@@ -1,0 +1,514 @@
+
+{% include "header_2.html" %}
+<script>
+    function printContent(el){
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+    }
+
+    function tableToExcel(table, name, filename) {
+        let uri = 'data:application/vnd.ms-excel;base64,',
+            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><title></title><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>',
+            base64 = function(s) { return window.btoa(decodeURIComponent(encodeURIComponent(s))) },         format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; })}
+
+        if (!table.nodeType) table = document.getElementById(table)
+        var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
+
+        var link = document.createElement('a');
+        link.download = filename;
+        link.href = uri + base64(format(template, ctx));
+        link.click();
+    }
+
+    function checkQuarterlyDownload(){
+        if (document.getElementById("quarter_number").value == "1"){
+            tableToExcel('quarterly_1', 'name', '1stQuarter.xls')
+        }
+        else if (document.getElementById("quarter_number").value == "2"){
+            tableToExcel('quarterly_2', 'name', '2ndQuarter.xls')
+        }
+        else if (document.getElementById("quarter_number").value == "3"){
+            tableToExcel('quarterly_3)', 'name', '3rdQuarter.xls')
+        }
+        else if (document.getElementById("quarter_number").value == "4"){
+            tableToExcel('quarterly_4', 'name', '4thQuarter.xls')
+        }
+    }
+
+
+    function checkQuarterlyPrint(){
+
+        if (document.getElementById("quarter_number").value == "1"){
+            printContent("print_quarter_1")
+        }
+        else if (document.getElementById("quarter_number").value == "2"){
+            printContent("print_quarter_2")
+        }
+        else if (document.getElementById("quarter_number").value == "3"){
+            printContent("print_quarter_3")
+        }
+        else if (document.getElementById("quarter_number").value == "4"){
+            printContent("print_quarter_4")
+        }
+
+    }
+</script>
+
+
+<link href="{{url_for('static', filename = 'css/bootstrap.min.css')}}" rel="stylesheet">
+
+{% block body %}
+
+    <section class="content-block pricing-table-1 pricing-table-1-1">
+        <div class="container">
+            <div class="underlined-title">
+                <h1>GENERATE REPORTS</h1>
+                <hr>
+                <h2>PATIENT REPORTS</h2>
+                <h3><strong><font color="white">{{ date_now }}</font></strong></h3>
+            </div>
+            <div class="row">
+                <div class="col-md-3 col-sm-6 price-block">
+                    <!-- Ribbon -->
+                    <h3>Daily report</h3>
+                    <ul class="features">
+                        <li>
+                            <br>
+                            <button type="button" class="btn btn-dark" onclick="tableToExcel('daily_table', 'name', 'daily.xls')" >Download</button>
+                        </li>
+                    </ul>
+                    <div class="price-footer">
+                        <a href="#" class="btn btn-info" onclick = "printContent('print_daily')">Print</a>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 price-block">
+                    <!-- Ribbon -->
+                    <h3>Monthly</h3>
+                    <ul class="features">
+                        <li>
+                            <br>
+                            <button type="button" class="btn btn-dark" onclick="tableToExcel('monthly_table', 'name', 'monthly.xls')">Download</button>
+                        </li>
+                    </ul>
+                    <div class="price-footer">
+                        <a href="#" class="btn btn-info" onclick = " printContent('print_monthly')">Print</a>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 price-block">
+                    <!-- Ribbon -->
+                    <h3>Yearly</h3>
+                    <ul class="features">
+                        <li>
+                            <br>
+                            <button type="button" class="btn btn-dark" onclick="tableToExcel('yearly_table', 'name', 'yearly.xls')" >Download</button>
+                        </li>
+                    </ul>
+                    <div class="price-footer">
+                        <a href="#" class="btn btn-info" onclick = " printContent('print_yearly')">PRINT</a>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 price-block">
+                    <!-- Ribbon -->
+                    <h3>Quarterly</h3>
+                    <ul class="features">
+                        <li>
+                            <input type="number" class="form-control" placeholder="Quarter" id="quarter_number">
+                        </li>
+                        <button type="button" class="btn btn-dark" onclick = "checkQuarterlyDownload()">Download</button>
+                        <li></li>
+                    </ul>
+                    <div class="price-footer">
+                        <a href="#" class="btn btn-info" onclick = "checkQuarterlyPrint()">Print</a>
+                    </div>
+                </div>
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container -->
+    </section>
+
+
+
+
+
+
+
+    <div id = "print_daily" style = "display: none;" >
+        <h3 class="text-align: center;">Daily Report</h3>
+        <h4 >List of Patients</h4>
+        <br>
+        <table class="table table-striped" id = "daily_table">
+            <tr>
+                <th>id</th>
+                <th>Last Name</th>
+                <th>First Name</th>
+                <th>Middle Name</th>
+                <th>Birthday</th>
+                <th>Age</th>
+                <th>Sex</th>
+                <th>CS</th>
+                <th>PHIC</th>
+                <th>Address</th>
+                <th>Chief Complaints</th>
+                <th>Impression</th>
+                <th>Management</th>
+                <th>Width</th>
+                <th>Height</th>
+                <th>BP</th>
+
+                <th>Patient Date</th>
+            </tr>
+            {% for row in daily %}
+                <tr>
+                    <td>{{ row.0 }}</td>
+                    <td>{{ row.4 }}</td>
+                    <td>{{ row.2 }}</td>
+                    <td>{{ row.3 }}</td>
+
+                    <td>{{ row.18 }}</td>
+                    <td>{{ row.5 }}</td>
+                    <td>{{ row.6 }}</td>
+                    <td>{{ row.7 }}</td>
+                    <td>{{ row.8 }}</td>
+                    <td>{{ row.9 }}</td>
+                    <td>{{ row.10 }}</td>
+                    <td>{{ row.19 }}</td>
+                    <td>{{ row.20 }}</td>
+                    <td>{{ row.11 }}</td>
+                    <td>{{ row.12 }}</td>
+                    <td>{{ row.13 }}</td>
+
+                    <td>{{ row.17 }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div id = "print_monthly" style = "display: none;" >
+        <h3 class="text-align: center;">Monthly Report</h3>
+        <h4 >List of Patients</h4>
+        <br>
+        <table class="table table-striped" id = "monthly_table">
+            <tr>
+                <th>id</th>
+                <th>Last Name</th>
+                <th>First Name</th>
+                <th>Middle Name</th>
+                <th>Birthday</th>
+                <th>Age</th>
+                <th>Sex</th>
+                <th>CS</th>
+                <th>PHIC</th>
+                <th>Address</th>
+                <th>Chief Complaints</th>
+                <th>Impression</th>
+                <th>Management</th>
+                <th>Width</th>
+                <th>Height</th>
+                <th>BP</th>
+
+                <th>Patient Date</th>
+
+            </tr>
+            {% for row in monthly %}
+                <tr>
+                    <td>{{ row.0 }}</td>
+                    <td>{{ row.4 }}</td>
+                    <td>{{ row.2 }}</td>
+                    <td>{{ row.3 }}</td>
+
+                    <td>{{ row.18 }}</td>
+                    <td>{{ row.5 }}</td>
+                    <td>{{ row.6 }}</td>
+                    <td>{{ row.7 }}</td>
+                    <td>{{ row.8 }}</td>
+                    <td>{{ row.9 }}</td>
+                    <td>{{ row.10 }}</td>
+                    <td>{{ row.19 }}</td>
+                    <td>{{ row.20 }}</td>
+                    <td>{{ row.11 }}</td>
+                    <td>{{ row.12 }}</td>
+                    <td>{{ row.13 }}</td>
+
+                    <td>{{ row.17 }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div id = "print_yearly" style = "display: none;" >
+        <h3 class="text-align: center;">Yearly Report</h3>
+        <h4 >List of Patients</h4>
+        <br>
+        <table class="table table-striped" id = "yearly_table">
+            <tr>
+                <th>id</th>
+                <th>Last Name</th>
+                <th>First Name</th>
+                <th>Middle Name</th>
+                <th>Birthday</th>
+                <th>Age</th>
+                <th>Sex</th>
+                <th>CS</th>
+                <th>PHIC</th>
+                <th>Address</th>
+                <th>Chief Complaints</th>
+                <th>Impression</th>
+                <th>Management</th>
+                <th>Width</th>
+                <th>Height</th>
+                <th>BP</th>
+
+                <th>Patient Date</th>
+
+            </tr>
+            {% for row in yearly %}
+                <tr>
+                    <td>{{ row.0 }}</td>
+                    <td>{{ row.4 }}</td>
+                    <td>{{ row.2 }}</td>
+                    <td>{{ row.3 }}</td>
+
+                    <td>{{ row.18 }}</td>
+                    <td>{{ row.5 }}</td>
+                    <td>{{ row.6 }}</td>
+                    <td>{{ row.7 }}</td>
+                    <td>{{ row.8 }}</td>
+                    <td>{{ row.9 }}</td>
+                    <td>{{ row.10 }}</td>
+                    <td>{{ row.19 }}</td>
+                    <td>{{ row.20 }}</td>
+                    <td>{{ row.11 }}</td>
+                    <td>{{ row.12 }}</td>
+                    <td>{{ row.13 }}</td>
+
+                    <td>{{ row.17 }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div id = "print_quarter_1" style = "display: none;" >
+        <h3 class="text-align: center;">1st Qurater Report</h3>
+        <h4 >List of Patients</h4>
+        <br>
+        <table class="table table-striped" id = "quarterly_1">
+            <tr>
+                <th>id</th>
+                <th>Last Name</th>
+                <th>First Name</th>
+                <th>Middle Name</th>
+                <th>Birthday</th>
+                <th>Age</th>
+                <th>Sex</th>
+                <th>CS</th>
+                <th>PHIC</th>
+                <th>Address</th>
+                <th>Chief Complaints</th>
+                <th>Impression</th>
+                <th>Management</th>
+                <th>Width</th>
+                <th>Height</th>
+                <th>BP</th>
+
+                <th>Patient Date</th>
+
+            </tr>
+            {% for row in quarter_1 %}
+                <tr>
+                    <td>{{ row.0 }}</td>
+                    <td>{{ row.4 }}</td>
+                    <td>{{ row.2 }}</td>
+                    <td>{{ row.3 }}</td>
+
+                    <td>{{ row.18 }}</td>
+                    <td>{{ row.5 }}</td>
+                    <td>{{ row.6 }}</td>
+                    <td>{{ row.7 }}</td>
+                    <td>{{ row.8 }}</td>
+                    <td>{{ row.9 }}</td>
+                    <td>{{ row.10 }}</td>
+                    <td>{{ row.19 }}</td>
+                    <td>{{ row.20 }}</td>
+                    <td>{{ row.11 }}</td>
+                    <td>{{ row.12 }}</td>
+                    <td>{{ row.13 }}</td>
+
+                    <td>{{ row.17 }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div id = "print_quarter_2" style = "display: none;" >
+        <h3 class="text-align: center;">2nd Quarter Report</h3>
+        <h4 >List of Patients</h4>
+        <br>
+        <table class="table table-striped" id = "quarterly_2">
+            <tr>
+                <th>id</th>
+                <th>Last Name</th>
+                <th>First Name</th>
+                <th>Middle Name</th>
+                <th>Birthday</th>
+                <th>Age</th>
+                <th>Sex</th>
+                <th>CS</th>
+                <th>PHIC</th>
+                <th>Address</th>
+                <th>Chief Complaints</th>
+                <th>Impression</th>
+                <th>Management</th>
+                <th>Width</th>
+                <th>Height</th>
+                <th>BP</th>
+
+                <th>Patient Date</th>
+
+            </tr>
+            {% for row in quarter_2 %}
+                <tr>
+                    <td>{{ row.0 }}</td>
+                    <td>{{ row.4 }}</td>
+                    <td>{{ row.2 }}</td>
+                    <td>{{ row.3 }}</td>
+
+                    <td>{{ row.18 }}</td>
+                    <td>{{ row.5 }}</td>
+                    <td>{{ row.6 }}</td>
+                    <td>{{ row.7 }}</td>
+                    <td>{{ row.8 }}</td>
+                    <td>{{ row.9 }}</td>
+                    <td>{{ row.10 }}</td>
+                    <td>{{ row.19 }}</td>
+                    <td>{{ row.20 }}</td>
+                    <td>{{ row.11 }}</td>
+                    <td>{{ row.12 }}</td>
+                    <td>{{ row.13 }}</td>
+                    <td>{{ row.14 }}</td>
+                    <td>{{ row.15 }}</td>
+                    <td>{{ row.16 }}</td>
+                    <td>{{ row.17 }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div id = "print_quarter_3" style = "display: none;" >
+        <h3 class="text-align: center;">3rd Quarter Report</h3>
+        <h4 >List of Patients</h4>
+
+        <br>
+        <table class="table table-striped" id = "quarterly_3">
+            <tr>
+                <th>id</th>
+                <th>Last Name</th>
+                <th>First Name</th>
+                <th>Middle Name</th>
+                <th>Birthday</th>
+                <th>Age</th>
+                <th>Sex</th>
+                <th>CS</th>
+                <th>PHIC</th>
+                <th>Address</th>
+                <th>Chief Complaints</th>
+                <th>Impression</th>
+                <th>Management</th>
+                <th>Width</th>
+                <th>Height</th>
+                <th>BP</th>
+
+                <th>Patient Date</th>
+
+            </tr>
+            {% for row in quarter_3 %}
+                <tr>
+                    <td>{{ row.0 }}</td>
+                    <td>{{ row.4 }}</td>
+                    <td>{{ row.2 }}</td>
+                    <td>{{ row.3 }}</td>
+
+                    <td>{{ row.18 }}</td>
+                    <td>{{ row.5 }}</td>
+                    <td>{{ row.6 }}</td>
+                    <td>{{ row.7 }}</td>
+                    <td>{{ row.8 }}</td>
+                    <td>{{ row.9 }}</td>
+                    <td>{{ row.10 }}</td>
+                    <td>{{ row.19 }}</td>
+                    <td>{{ row.20 }}</td>
+                    <td>{{ row.11 }}</td>
+                    <td>{{ row.12 }}</td>
+                    <td>{{ row.13 }}</td>
+
+                    <td>{{ row.17 }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div id = "print_quarter_4" style = "display: none;" >
+        <h3 class="text-align: center;">4th Quarter Report</h3>
+        <h4 >List of Patients</h4>
+        <br>
+        <table class="table table-striped" id = "quarterly_4">
+            <tr>
+                <th>id</th>
+                <th>Last Name</th>
+                <th>First Name</th>
+                <th>Middle Name</th>
+                <th>Birthday</th>
+                <th>Age</th>
+                <th>Sex</th>
+                <th>CS</th>
+                <th>PHIC</th>
+                <th>Address</th>
+                <th>Chief Complaints</th>
+                <th>Impression</th>
+                <th>Management</th>
+                <th>Width</th>
+                <th>Height</th>
+                <th>BP</th>
+
+                <th>Patient Date</th>
+
+            </tr>
+            {% for row in quarter_4 %}
+                <tr>
+                    <td>{{ row.0 }}</td>
+                    <td>{{ row.4 }}</td>
+                    <td>{{ row.2 }}</td>
+                    <td>{{ row.3 }}</td>
+
+                    <td>{{ row.18 }}</td>
+                    <td>{{ row.5 }}</td>
+                    <td>{{ row.6 }}</td>
+                    <td>{{ row.7 }}</td>
+                    <td>{{ row.8 }}</td>
+                    <td>{{ row.9 }}</td>
+                    <td>{{ row.10 }}</td>
+                    <td>{{ row.19 }}</td>
+                    <td>{{ row.20 }}</td>
+                    <td>{{ row.11 }}</td>
+                    <td>{{ row.12 }}</td>
+                    <td>{{ row.13 }}</td>
+
+                    <td>{{ row.17 }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <section class="content-block-nopad bg-deepocean footer-wrap-1-2">
+        <div class="container footer-1-2">
+            <button type="button" class="btn btn-default"  onclick="window.location.href='{{ url_for("Patient") }}'" >bACK</button>
+        </div>
+        <!-- /.container -->
+    </section>
+
+{% endblock %}
+{% include "footer_2.html" %}
+<script type="text/javascript" src="{{url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
+<script type="text/javascript" src="{{url_for('static', filename = 'js/bootstrap.min.js')}}"></script>

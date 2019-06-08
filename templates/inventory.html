@@ -1,0 +1,352 @@
+
+{% include "header_2.html" %}
+<script>
+    function printContent(el){
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+    }
+</script>
+<link href="{{url_for('static', filename = 'css/bootstrap.min.css')}}" rel="stylesheet">
+
+{% block body %}
+    <section class="content-block content-2-3 bg-transparent black">
+        <div class="container">
+            <div class="col-sm-7 pull-left text-muted">
+                <h2 class="text-muted black">Pharmacy Record</h2>
+                <!--
+                <button type="button" class="btn btn-dark" onclick = "printContent('divtoprint')">
+                    <i class="fa fa-print" style="font-size:20px"></i>
+                </button>
+                -->
+                <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#printmodal">
+                    <i class="fa fa-print" style="font-size:20px"></i>
+                </button>
+                <span class="label black" value=" SORT - BY:">&nbsp; &nbsp; SORT - BY:</span>
+                <span class="label label-default"></span>
+                <button type="button" class="btn btn-dark" onclick="window.location.href='/inventory_sort_atoz'">A-Z</button>
+                <button type="button" class="btn btn-dark" onclick="window.location.href='/inventory_sort_date'">date</button>
+                <button type="button" class="btn btn-dark" onclick="window.location.href='/inventory_sort_exp_date'">Exp-Date</button>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="input-group">
+                    <form action="{{ url_for('inventory_search') }}" method="POST">
+                        <span class="input-group-btn ">
+                            <input type="text" class="form-control" name = "search" placeholder="search medicine">
+                            <button class="btn btn-dark" type="submit" type="button"><i class="fa fa-search" style="font-size:16px"></i></button>
+                        </span>
+                    </form>
+                </div>
+                <!-- /.input-group -->
+            </div>
+            <button type="button" data-toggle="modal" data-target="#mymodal" class="btn text-center pull-right btn-success" >Add Medicine Data</button>
+        </div>
+    </section>
+
+    <div id = "divtoprint" style = "display: none;" >
+        <h3 class="text-align: center;">Pharmacy Record</h3>
+        <h4 >List of all Medicine</h4>
+        <br>
+        <table class="table table-striped">
+            <tr>
+                <th>medicine_name</th>
+                <th>quantity</th>
+                <th>unit</th>
+                <th>description</th>
+                <th>batch</th>
+                <th>exp_date</th>
+                <th>unit_price</th>
+                <th>amount</th>
+                <th>en_date</th>
+            </tr>
+            {% for row in medicine %}
+                <tr>
+                    <td>{{ row.1 }}</td>
+                    <td>{{ row.2 }}</td>
+                    <td>{{ row.3 }}</td>
+                    <td>{{ row.4 }}</td>
+                    <td>{{ row.5 }}</td>
+                    <td>{{ row.6 }}</td>
+                    <td>{{ row.7 }}</td>
+                    <td>{{ row.8 }}</td>
+                    <td>{{ row.9 }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col md-12">
+
+                {%with messages = get_flashed_messages()%}
+                    {%if messages%}
+                        {% for message in messages %}
+                            <div class="alert alert-success alert-dismissable" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label ="close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                {{message}}
+                            </div>
+                        {%endfor%}
+                    {%endif%}
+                {%endwith%}
+                <table class="table table-striped">
+                    <tr>
+                        <th>medicine_name</th>
+                        <th>quantity</th>
+                        <th>unity</th>
+                        <th>description</th>
+                        <th>batch</th>
+                        <th>exp_date</th>
+                        <th>unit_price</th>
+                        <th>amount</th>
+                        <th>en_date</th>
+                        <th>Action</th>
+                    </tr>
+                    {% for row in medicine %}
+                        <tr>
+                            <td>{{ row.1 }}</td>
+                            <td>{{ row.2 }}</td>
+                            <td>{{ row.3 }}</td>
+                            <td>{{ row.4 }}</td>
+                            <td>{{ row.5 }}</td>
+                            <td>{{ row.6 }}</td>
+                            <td>{{ row.7 }}</td>
+                            <td>{{ row.8 }}</td>
+                            <td>{{ row.9 }}</td>
+                            <td>
+                                <a href="/med_update/{{row.0}}" class="btn btn-dark btn-xs" data-toggle="modal" data-target="#modalrelease{{row.0}}">release</a>
+                                <a href="/med_update/{{row.0}}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit{{row.0}}"><i class="fa fa-edit" style="font-size:16px"></i></a>
+                                <a href="/med_delete/{{ row.0 }}" class="btn btn-danger btn-xs" onclick="return confirm('Are You Sure For Delete?')"><i class="fa fa-trash" style="font-size:16px"></i></a>
+                            </td>
+                        </tr>
+
+                        <div id="modaledit{{row.0}}" class="modal fade" role="dialog">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Update Medicine Data</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="{{ url_for('med_update') }}" method="POST">
+                                            <div class="form-group">
+                                                <label>Medicine Name:</label>
+                                                <input type="hidden"  name="id" value="{{row.0}}">
+                                                <input type="text" class="form-control" value= "{{ row.1 }}" name="medicine_name" required="1">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Quantity:</label>
+                                                <input type="number" class="form-control" value = "{{ row.2 }}" name="quantity" required="1">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Unit:</label>
+                                                <input type="text" class="form-control" value = "{{ row.3 }}" name="unit" required="1">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Description:</label>
+                                                <input type="text" class="form-control" value = "{{ row.4 }}" name="description" required="1">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Batch:</label>
+                                                <input type="text" class="form-control" value = "{{ row.5 }}" name="batch" required="1">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Expiration Date:</label>value = "{{ row.5 }}"
+                                                <input type="date" class="form-control" value = "{{ row.6 }}" name="exp_date" required="1">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Unit Price:</label>
+                                                <input type="int" class="form-control" value = "{{ row.7 }}" name="unit_price" required="1">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Amount:</label>
+                                                <input type="int" class="form-control" value = "{{ row.8 }}" name="amount" required="1">
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <button class="btn btn-primary" type="submit">Update Data</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div id="modalrelease{{row.0}}" class="modal fade" role="dialog">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Release Medicine </h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="{{ url_for('med_release') }}" method="POST">
+                                            <div class="form-group">
+                                                <input type="hidden"  name="id" value="{{row.0}}">
+                                                <input type="hidden" class="form-control" value= "{{ row.1 }}" name="medicine_name" >
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Quantity to Release:</label>
+                                                <input type="number" class="form-control"  name="quantity_to_release" required="1">
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="hidden" class="form-control" value = "{{ row.2 }}" name="quantity" >
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="hidden" class="form-control"  name="batch"  value = "{{ row.5 }}">
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="hidden" class="form-control" value = "{{ row.6 }}" name="exp_date" >
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label>Released To:</label>
+                                                <select class="form-control" name="released_to">
+                                                    {% for item in full_name %}
+                                                    <option value="{{ item }}" >{{ item }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+
+
+
+
+
+
+                                            <div class="form-group">
+                                                <button class="btn btn-primary" type="submit">Release</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor  %}
+                    </tbody>
+                </table>
+            </div>
+
+
+            <!------------------------------------------------------->
+            <div id = "printmodal" class = "modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class = "modal-header">
+                            <button type="button" class ="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Insert Patient Information</h4>
+                        </div>
+
+                        <div class = "modal-body">
+                            <form action="{{ url_for('invoice_print') }}" method="POST">
+                                <div class="form-group">
+                                </div>
+                                <div class="form-group">
+                                    <label>Enter Date:</label>
+                                    <input type="date" class="form-control"  name="date_now" required="1">
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-primary" type="submit">Generate Reports</button>
+                                </div>
+
+                            </form>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <!-- Modal -->
+            <div id = "mymodal" class = "modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class = "modal-header">
+                            <button type="button" class ="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Insert Medicine Data</h4>
+                        </div>
+
+                        <div class = "modal-body">
+                            <form action="{{ url_for('med_insert') }}" method="POST">
+                                <div class="form-group">
+                                    <label>Medicine Name:</label>
+                                    <input type="text" class="form-control" name="medicine_name" required="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Quantity:</label>
+                                    <input type="number" class="form-control"  name="quantity" required="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Unit:</label>
+                                    <input type="text" class="form-control" name="unit" required="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Description:</label>
+                                    <input type="text" class="form-control" name="description" required="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Batch:</label>
+                                    <input type="text" class="form-control"  name="batch" required="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Expiration Date:</label>
+                                    <input type="date" class="form-control"  name="exp_date" required="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Unit Price:</label>
+                                    <input type="int" class="form-control" name="unit_price" required="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Amount:</label>
+                                    <input type="int" class="form-control"  name="amount" required="1">
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-primary" type="submit">Insert Data</button>
+                                </div>
+
+                            </form>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+{% include "footer_2.html" %}
+<script type="text/javascript" src="{{url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
+<script type="text/javascript" src="{{url_for('static', filename = 'js/bootstrap.min.js')}}"></script>

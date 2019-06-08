@@ -1,0 +1,133 @@
+
+{% include "header_2.html" %}
+<script>
+    function printContent(el){
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+    }
+</script>
+<link href="{{url_for('static', filename = 'css/bootstrap.min.css')}}" rel="stylesheet">
+
+{% block body %}
+    <section class="content-block content-2-3 bg-transparent black">
+        <div class="container">
+            <div class="col-sm-7 pull-left text-muted">
+                <h2 class="text-muted black">Individual Checkup Record</h2>
+
+
+
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="input-group">
+                    <form action="{{ url_for('patient_search') }}" method="POST">
+
+                    </form>
+                </div>
+                <!-- /.input-group -->
+            </div>
+<button type="button" class="btn btn-danger" onclick="window.location.href='/individual'" >Back</button>
+        </div>
+    </section>
+
+
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col md-12">
+
+                {%with messages = get_flashed_messages()%}
+                    {%if messages%}
+                        {% for message in messages %}
+                            <div class="alert alert-success alert-dismissable" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label ="close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                {{message}}
+                            </div>
+                        {%endfor%}
+                    {%endif%}
+                {%endwith%}
+                <table class="table table-striped">
+                    {% for item in individual %}
+                    <tr>
+                        <th>Personal Information</th>
+                        <th>Chief Complaint</th>
+                        <th>Impression</th>
+                        <th>Management</th>
+                        <th>Record</th>
+                    </tr>
+
+                        <tr>
+                            <td>
+                            <p><b></b><u><b></b></u><b>Name&nbsp;</b>: {{ item.2 }} {{ item.3 }} {{ item.4 }}</p>
+                            <p><b></b><u><b></b></u><b>address&nbsp;</b>: {{ item.9 }}</p>
+                            <p><b></b><u><b></b></u><b>age :</b>&nbsp;{{ item.5 }}</p>
+                            <p><b></b><u><b></b></u><b>blood pressure :</b>&nbsp;{{ item.13 }}</p>
+                            <p><b></b><u><b></b></u><b>T :</b>&nbsp;{{ item.14 }}</p>
+                            <p><b></b><u><b></b></u><b>PR :</b>&nbsp;{{ item.15}}</p>
+                            <p><b></b><u><b></b></u><b>RR :</b>&nbsp;{{ item.16 }}</p>
+
+                            </td>
+                            <td>{{ item.10 }}</td>
+                            <td>{{ item.19 }}</td>
+                            <td>{{ item.20 }}</td>
+
+
+                            <td>
+                                <p><b>Date:</b> {{ item.17 }}</p>
+                            <p><b>Doctor :</b> </p>
+                                <a href="/individual_records_update/{{item.21}}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit{{item.21}}">Findings </a>
+                        </tr>
+
+                        <div id="modaledit{{item.21}}" class="modal fade" role="dialog">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Findings</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="{{ url_for('individual_records_update') }}" method="POST">
+                                            <div class="form-group">
+                                                <input type="hidden"  name="individual_id" value="{{item.21}}">
+                                                <input type="hidden"  name="individual_doctor" value =
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Impressions:</label>
+                                                <input type="text"  class="form-control" name="individual_impressions" >
+                                                </input>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Management:</label>
+                                                <input type="text" class="form-control"  name="individual_management" >
+                                                </input>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <button class="btn btn-primary" type="submit">Insert/Update Findings</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor  %}
+                    </tbody>
+                </table>
+            </div>
+
+
+
+        </div>
+    </div>
+{% endblock %}
+{% include "footer_2.html" %}
+<script type="text/javascript" src="{{url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
+<script type="text/javascript" src="{{url_for('static', filename = 'js/bootstrap.min.js')}}"></script>
